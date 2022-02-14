@@ -1,1 +1,1 @@
-# Jira Synthetic Data Image 
+# Jira Synthetic Refresh
