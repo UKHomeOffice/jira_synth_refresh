@@ -47,6 +47,23 @@ def project_ids():
 
     return ids
 
+# Project names and keys 
+def name_project():
+    global project_name
+    global project_key
+    backup_list=['scopperil', 'postgames', 'morulae', 'liponyms', 'salamander', 'lannet', 'halogenate','sarmale', 'inkberries', 'microcin', 'falconry', 'schmears', 'setline', 'unboot', 'stylemark', 'hyoshigi', 'alinements', 'yessotoxin', 'quines', 'petrograph', 'draglift', 'dogears', 'stenter', 'pootles', 'rumbullion']
+    r=RandomWords()
+    project_name=r.get_random_word(hasDictionaryDef="true",includePartOfSpeech="noun,verb",minLength=6, maxLength=12)
+    if project_name is None or project_name.isalpha()==False:
+        new_word=random.choice(backup_list)
+        backup_list.remove(new_word)
+        project_name=new_word
+        project_key=project_name[:5].upper() 
+    else:
+        project_key=project_name[:5].upper() 
+
+
+
 # Create projects 
 def create_projects(projects):
     url = 'https://jira.shs-dev.dsa-notprod.homeoffice.gov.uk/rest/api/2/project'
@@ -56,14 +73,14 @@ def create_projects(projects):
     }
         
     for i in range(projects):
-        r=RandomWords()
-        project_name=r.get_random_word(hasDictionaryDef="true",minLength=5, maxLength=12)
-        project_key=project_name[:4].upper()
+        name_project()
+        # r=RandomWords()
+        # project_name=r.get_random_word(hasDictionaryDef="true",minLength=5, maxLength=12)
+        # project_key=project_name[:4].upper()
     
-
-        if project_name.isascii()==False or (project_key in ids):
-            project_name=r.get_random_word(hasDictionaryDef="true",minLength=5, maxLength=12)
-            project_key = project_name[:4].upper()
+        # if project_name.isascii()==False or (project_key in ids):
+        #     project_name=r.get_random_word(hasDictionaryDef="true",minLength=5, maxLength=12)
+        #     project_key = project_name[:4].upper()
 
         payload = json.dumps( {
             "key": project_key,
@@ -72,7 +89,6 @@ def create_projects(projects):
             "projectTemplateKey": "com.pyxis.greenhopper.jira:gh-kanban-template",
             "description": "Example Project description",
             "lead": "admin",
-            # "avatarId": 10200
             "avatarId": random.choice([10011,10200,10324,10318])
         } )
 
@@ -119,13 +135,15 @@ def create_issues(issues):
 
 # Add comments to issues 
 def comments(no_comments):
-    for i in ids[:3]:
-        issues=jira.get_project_issuekey_all(i)
-        for x in issues:
-            for y in range(no_comments):
-                jira.issue_add_comment(x, gen.sentence())
-            logging.info('%s %s comments(s) created successfully. %s \n', SUCCESS, no_comments, isotime )
-
+    for i in ids:
+        try:
+            issues=jira.get_project_issuekey_all(i)
+            for x in issues:
+                for y in range(no_comments):
+                    jira.issue_add_comment(x, gen.sentence())
+                logging.info('%s %s comments(s) created successfully. %s \n', SUCCESS, no_comments, isotime )
+        except:
+            logging.error('%s Cannot create issues(s). %s \n', ERROR, isotime )
 
 # Functions:
 connection()
@@ -137,5 +155,5 @@ except:
     logging.raiseExceptions
 project_ids()
 create_issues(issues = int(os.environ['ISSUES']))
-comments(projects = int(os.environ['COMMENTS']))
+comments(no_comments = int(os.environ['COMMENTS']))
 
