@@ -57,5 +57,5 @@ def comments(no_comments):
 7. Run functions 
 
 
-## Author
-Aminah Ahmed 
+## Credits
+Aminah Ahmed | Ben Gilbert | Christopher Rogers 
